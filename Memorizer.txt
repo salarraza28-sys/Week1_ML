@@ -1,0 +1,213 @@
+MEMORIZER (HASH MAP LEARNER)
+BIG IDEA (WHAT THIS MODEL IS)
+
+The Memorizer classifier is the opposite of a zero-rule classifier.
+
+It:
+
+Uses ALL features
+
+Memorizes every training example exactly
+
+Stores each input row and its label in a dictionary (hash map)
+
+Predicts by exact lookup
+
+This means:
+
+If a test example was seen during training → correct prediction
+
+If a test example was NOT seen → error (or failure)
+
+This model has:
+
+Zero generalization
+
+Perfect training accuracy
+
+Very poor real-world usefulness
+
+WHAT EACH PART OF THE CODE DOES
+
+row_to_key(row)
+
+Purpose:
+
+Convert a row (list) into a hashable key
+
+Dictionaries require immutable keys
+
+Code logic:
+return tuple(row)
+
+Example:
+row = [1, 0]
+key = (1, 0)
+
+Memorizer class
+
+This class memorizes mappings:
+(row → label)
+
+init method
+
+def init(self) -> None:
+self.table = None
+
+Explanation:
+
+Initializes the memorizer
+
+table will store the dictionary of learned examples
+
+Starts as None to indicate the model is not trained yet
+
+fit(self, X, y) (Training Step)
+
+Purpose:
+
+Store every training example exactly
+
+Step 1: Validate input sizes
+
+if len(X) != len(y):
+raise ValueError("X and y must have the same length")
+
+Explanation:
+
+Each input row must have a corresponding label
+
+Step 2: Initialize memory table
+
+self.table = {}
+
+Explanation:
+
+Creates an empty dictionary
+
+Keys = feature rows (as tuples)
+
+Values = labels
+
+Step 3: Store each training example
+
+for row, label in zip(X, y):
+key = row_to_key(row)
+self.table[key] = label
+
+Example training data:
+X_train = [[0,0], [0,1], [1,0], [1,1]]
+y_train = ["A", "B", "C", "D"]
+
+Stored dictionary:
+(0,0) → "A"
+(0,1) → "B"
+(1,0) → "C"
+(1,1) → "D"
+
+predict(self, X) (Prediction Step)
+
+Purpose:
+
+Predict labels using exact dictionary lookup
+
+Step 1: Ensure fit() was called
+
+if self.table is None:
+raise RuntimeError("fit() must be called before predict()")
+
+Explanation:
+
+Prevents prediction before training
+
+Step 2: Predict each test row
+
+Logic:
+
+Convert row to tuple key
+
+If key exists → return stored label
+
+If key does not exist → unseen example
+
+Current code behavior:
+
+Prints a message for unseen rows
+
+Appends None instead of raising an error
+
+Example:
+Unseen row: [9, 9]
+Prediction: None
+
+main() function
+
+This demonstrates how the memorizer works.
+
+TRAINING DATA
+
+X_train:
+[0,0], [0,1], [1,0], [1,1]
+
+y_train:
+"A", "B", "C", "D"
+
+Each row is memorized exactly.
+
+TEST DATA
+
+X_test:
+[0,0] → seen
+[1,1] → seen
+[9,9] → unseen
+
+EXPECTED OUTPUT
+
+Seen rows:
+[0,0] → "A"
+[1,1] → "D"
+
+Unseen row:
+[9,9] → None (or KeyError conceptually)
+
+Final output:
+Predictions on [[0,0], [1,1], [9,9]]:
+["A", "D", None]
+
+WHY THIS MODEL IS IMPORTANT
+
+Advantages:
+
+Perfect memory
+
+100% training accuracy
+
+Simple to understand
+
+Disadvantages:
+
+No generalization
+
+Cannot handle unseen data
+
+Not practical for real ML problems
+
+RELATION TO OTHER MODELS
+
+Zero-Rule (Majority Vote):
+
+Uses NO features
+
+Predicts same label always
+
+Memorizer:
+
+Uses ALL features
+
+Predicts only seen examples
+
+Real ML models (KNN, DT, NB, LR):
+
+Learn patterns
+
+Generalize to unseen data
